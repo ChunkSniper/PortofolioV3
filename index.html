@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JXSTN | 3D Modeler For Hire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #06070b;
+      --bg-2: #0b0e16;
+      --card: rgba(16, 20, 33, 0.72);
+      --line: rgba(255,255,255,0.08);
+      --text: #f2f5ff;
+      --muted: #a8b0c7;
+      --accent: #7c5cff;
+      --accent-2: #17d2ff;
+      --good: #8dffb8;
+      --warn: #ffd36e;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 24px;
+      --radius-sm: 18px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(124,92,255,.18), transparent 28%),
+        radial-gradient(circle at 85% 10%, rgba(23,210,255,.12), transparent 24%),
+        linear-gradient(180deg, #05060a 0%, #070912 40%, #05060a 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black 55%, transparent 95%);
+      opacity: .35;
+    }
+
+    .wrap {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(14px);
+      z-index: 5;
+    }
+
+    .brand {
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: white;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    .btn {
+      color: var(--text);
+      text-decoration: none;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      transition: .25s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .nav-links a:hover,
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,0.06);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 28px;
+      align-items: stretch;
+      padding: 42px 0 24px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-left {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left::after {
+      content: "";
+      position: absolute;
+      inset: auto -60px -60px auto;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(124,92,255,.28), transparent 65%);
+      filter: blur(14px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--good);
+      font-size: .9rem;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 5.2rem);
+      line-height: .95;
+      margin: 0 0 14px;
+      letter-spacing: -.05em;
+    }
+
+    h1 span {
+      display: block;
+      background: linear-gradient(90deg, #ffffff, #a7b8ff 45%, #6deaff 85%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .lead {
+      font-size: 1.06rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 62ch;
+      margin-bottom: 22px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 26px 0 24px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn.primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      border: none;
+      font-weight: 700;
+    }
+
+    .hero-right {
+      padding: 18px;
+      display: grid;
+      place-items: center;
+      min-height: 520px;
+    }
+
+    .featured-card {
+      width: 100%;
+      height: 100%;
+      min-height: 480px;
+      border-radius: 26px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .featured-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.03);
+      transition: transform .5s ease;
+    }
+
+    .featured-card:hover img { transform: scale(1.08); }
+
+    .featured-overlay {
+      position: absolute;
+      inset: auto 16px 16px 16px;
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(5,8,16,.3), rgba(5,8,16,.88));
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+    }
+
+    section {
+      padding: 18px 0 8px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 0 18px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      letter-spacing: -.03em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 60ch;
+      line-height: 1.7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .project-card {
+      overflow: hidden;
+      transition: .28s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,.14);
+    }
+
+    .project-thumb {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background: rgba(255,255,255,.03);
+    }
+
+    .project-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .4s ease;
+      display: block;
+    }
+
+    .project-card:hover .project-thumb img {
+      transform: scale(1.08);
+    }
+
+    .project-body {
+      padding: 18px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: .82rem;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.06);
+      color: #d6defa;
+    }
+
+    .about-boxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .info-box {
+      padding: 24px;
+    }
+
+    .info-box h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 1.15rem;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .list li {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.06);
+      color: var(--muted);
+    }
+
+    .list li strong { color: var(--text); }
+
+    .pricing {
+      padding: 26px;
+    }
+
+    .pricing p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .cta {
+      margin: 28px 0 60px;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .cta h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+    }
+
+    .cta p {
+      margin: 0 auto 18px;
+      max-width: 60ch;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .footer {
+      padding: 0 0 40px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .95rem;
+    }
+
+    .muted-emoji {
+      filter: saturate(.85);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .about-boxes,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-right {
+        min-height: unset;
+      }
+
+      .featured-card {
+        min-height: 360px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-left,
+      .info-box,
+      .pricing,
+      .cta {
+        padding: 22px;
+      }
+
+      .nav {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .section-head {
+        flex-direction: column;
+        align-items: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <div class="brand">JXSTN</div>
+      <div class="nav-links">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#pricing">Info</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="panel hero-left">
+        <div class="eyebrow">🟢 Available for commissions</div>
+        <h1>
+          3D Modeler
+          <span>For Hire</span>
+        </h1>
+        <p class="lead">
+          Hi! I’m <strong>JXSTN</strong> — a dedicated <strong>3D modeler with around 2 years of experience</strong>. I mainly focus on <strong>clean low-poly models</strong>. I can also handle some higher-detail work depending on the project. <span class="muted-emoji">🎯</span>
+        </p>
+        <p class="lead">
+          My average model time is around <strong>40 minutes</strong> for standard work, while larger or more detailed commissions may take longer. I aim to keep my workflow fast, polished, and client-friendly. <span class="muted-emoji">⚡</span>
+        </p>
+
+        <div class="stats">
+          <div class="stat">
+            <strong>2+ Years</strong>
+            <span>3D modeling experience</span>
+          </div>
+          <div class="stat">
+            <strong>~40 Min</strong>
+            <span>Average model time</span>
+          </div>
+          <div class="stat">
+            <strong>Low-Poly</strong>
+            <span>Main specialty & focus</span>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="#work">🚀 View My Work</a>
+          <a class="btn" href="#contact">💬 Hire Me</a>
+        </div>
+      </div>
+
+      <div class="panel hero-right">
+        <div class="featured-card">
+          <img src="https://imgur.com/Dr43659.png" alt="Featured 3D work preview" />
+          <div class="featured-overlay">
+            <strong>Featured Work</strong>
+            <div style="color: var(--muted); margin-top: 8px; line-height: 1.6;">
+              A featured showcase area for one of my favorite models. ✨
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="work">
+      <div class="section-head">
+        <div>
+          <h2>Selected Work</h2>
+        </div>
+        <p>
+          This section is made to be easy to update. Just replace the image links and edit the title or description for each card. 🧩
+        </p>
+      </div>
+      <div class="grid" id="projectsGrid"></div>
+    </section>
+
+    <section id="about">
+      <div class="section-head">
+        <div>
+          <h2>What I Do</h2>
+        </div>
+        <p>
+          Clear expectations make projects smoother, so here’s a clean breakdown of the type of work I usually take. ✅
+        </p>
+      </div>
+
+      <div class="about-boxes">
+        <div class="panel info-box">
+          <h3>✅ What I Usually Work On</h3>
+          <ul class="list">
+            <li><strong>Low-poly models</strong> for games and projects</li>
+            <li><strong>Props & assets</strong> with clean, readable shapes</li>
+            <li><strong>Stylized pieces</strong> depending on complexity</li>
+            <li><strong>Some UGC work</strong>, if it is not too complex</li>
+          </ul>
+        </div>
+
+        <div class="panel info-box">
+          <h3>⚠️ What I Don’t Do</h3>
+          <ul class="list">
+            <li><strong>Armors</strong></li>
+            <li><strong>Cars</strong></li>
+            <li><strong>Characters</strong></li>
+            <li><strong>Hair</strong></li>
+            <li><strong>Complex UGC</strong> or hair-based UGC</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="section-head">
+        <div>
+          <h2>Commission Info</h2>
+        </div>
+        <p>
+          A simple section that explains your payment style without sounding messy or unprofessional. 💸
+        </p>
+      </div>
+
+      <div class="panel pricing">
+        <p>
+          <strong>Payment:</strong> At the moment, I accept <strong>money</strong>, <strong>Robux</strong>, or <strong>percentage deals</strong> if your game is already generating Robux. I’m open to discussing the best option depending on the project scope and workload.
+        </p>
+        <p>
+          <strong>UGC Note:</strong> I can work on <strong>some UGC items</strong>, but I do <strong>not</strong> take on hair or highly complex UGC projects. A clear reference and a simple brief will always help speed things up. 📌
+        </p>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="panel cta">
+        <h2>Let’s Build Something Clean 🔥</h2>
+        <p>
+          Need a reliable modeler for props, assets, or stylized low-poly work? Reach out and let’s talk about your idea, budget, and deadline.
+        </p>
+        <div class="hero-actions" style="justify-content:center;">
+          <a class="btn primary" href="https://www.youtube.com/@JxStn8/featured" target="_blank" rel="noreferrer">▶️ YouTube</a>
+          <a class="btn" href="mailto:iustinvornicu1797@gmail.com">📩 Email Me</a>
+          <a class="btn" href="https://discord.com/users/@me" target="_blank" rel="noreferrer">🎮 Discord: jxstnsecondacc</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      JXSTN
+    </div>
+  </div>
+
+  <script>
+    const projects = [
+      {
+        title: "Rengoku Katana",
+        description: "",
+        image: "https://i.imgur.com/Y244DAH.png",
+        tags: ["Weapon", "Anime", "Low-Poly"]
+      },
+      {
+        title: "Low Poly Pets",
+        description: "",
+        image: "https://i.imgur.com/GegjEix.png",
+        tags: ["Pets", "Stylized", "Game Assets"]
+      },
+      {
+        title: "Low Poly Axe",
+        description: "",
+        image: "https://i.imgur.com/Dr43659.png",
+        tags: ["Weapon", "Prop", "Low-Poly"]
+      },
+      {
+        title: "Hidan Scythe & Akatsuki Cloth",
+        description: "",
+        image: "https://i.imgur.com/m8CFaiZ.png",
+        tags: ["Anime", "Scythe", "Stylized"]
+      },
+      {
+        title: "Bat Badminton Racquet",
+        description: "",
+        image: "https://i.imgur.com/bAzmHul.png",
+        tags: ["Prop", "Creative", "Stylized"]
+      },
+      {
+        title: "Simple Bedroom",
+        description: "",
+        image: "https://i.imgur.com/tmlWOHx.png",
+        tags: ["Environment", "Interior", "Low-Poly"]
+      }
+    ];
+
+    const grid = document.getElementById('projectsGrid');
+
+    projects.forEach(project => {
+      const card = document.createElement('article');
+      card.className = 'panel project-card';
+      card.innerHTML = `
+        <div class="project-thumb">
+          <img src="${project.image}" alt="${project.title}">
+        </div>
+        <div class="project-body">
+          <h3 style="margin:0 0 10px; font-size:1.15rem;">${project.title}</h3>
+          <p style="margin:0; color:var(--muted); line-height:1.7;">${project.description}</p>
+          <div class="tag-row">
+            ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>
+
